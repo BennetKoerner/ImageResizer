@@ -16,6 +16,7 @@ class ImageCropper:
         self.image_list = []
         self.current_index = 0
         self.selected_grid_size = (512, 512)
+        self.scaled_image_size = (512, 512)
         self.grid_start_x = 0
         self.grid_start_y = 0
         self.image_original = None
@@ -40,6 +41,7 @@ class ImageCropper:
 
         self.canvas.bind("<Button-1>", self.on_canvas_click)
         self.canvas.bind("<B1-Motion>", self.on_canvas_drag)
+        self.canvas.bind("<MouseWheel>", self.on_canvas_scroll)
 
         self.load_images()
 
@@ -59,6 +61,10 @@ class ImageCropper:
         self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_img)
         self.draw_grid()
 
+        self.grid_start_x = min(self.grid_start_x, self.tk_img.width() - self.selected_grid_size[0])
+        self.grid_start_y = min(self.grid_start_y, self.tk_img.height() - self.selected_grid_size[1])
+        self.draw_grid()
+
     def show_previous_image(self):
         if self.current_index > 0:
             self.current_index -= 1
@@ -73,6 +79,7 @@ class ImageCropper:
     def update_grid_size(self, value):
         size_mapping = {"512x512": (512, 512), "1024x1024": (1024, 1024)}
         self.selected_grid_size = size_mapping[value]
+        self.scaled_image_size = size_mapping[value]
         self.draw_grid()
 
     def draw_grid(self):
@@ -96,11 +103,22 @@ class ImageCropper:
         self.grid_start_y = max(0, min(event.y, self.tk_img.height() - self.selected_grid_size[1]))
         self.draw_grid()
 
+    def on_canvas_scroll(self, event):
+        if event.delta > 0:
+            new_size = min(self.selected_grid_size[0] + 32, self.tk_img.width(), self.tk_img.height())
+        else:
+            new_size = max(self.selected_grid_size[0] - 32, 32)
+        self.selected_grid_size = (new_size, new_size)
+        self.draw_grid()
+
     def save_cropped_image(self):
         cropped_image = self.image_original[self.grid_start_y:self.grid_start_y + self.selected_grid_size[1],
                         self.grid_start_x:self.grid_start_x + self.selected_grid_size[0]]
+
+        resized_image = cv2.resize(cropped_image, self.scaled_image_size)
+
         cropped_image_path = os.path.join(self.output_folder, f"cropped_{self.image_list[self.current_index]}")
-        cv2.imwrite(cropped_image_path, cropped_image)
+        cv2.imwrite(cropped_image_path, resized_image)
 
 
 if __name__ == "__main__":
