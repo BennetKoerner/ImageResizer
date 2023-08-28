@@ -1,0 +1,7 @@
+#excludes files in this directory
+/input/*
+!/input/.gitkeep
+
+#excludes files in this directory
+/cropped/*
+!/cropped/.gitkeep
