@@ -1,7 +1,7 @@
 import os
 import cv2
 import tkinter as tk
-from PIL import Image, ImageTk, ImageOps
+from PIL import Image, ImageTk
 
 
 class ImageCropper:
