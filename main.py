@@ -22,20 +22,23 @@ class ImageCropper:
         self.image_original = None
 
         self.canvas = tk.Canvas(root)
-        self.canvas.pack()
+        self.canvas.pack(side=tk.LEFT)
 
-        self.load_button = tk.Button(root, text="Load Images", command=self.load_images)
+        button_frame = tk.Frame(root)
+        button_frame.pack(side=tk.RIGHT)
+
+        self.load_button = tk.Button(button_frame, text="Load Images", command=self.load_images)
         self.load_button.pack()
 
-        self.prev_button = tk.Button(root, text="Previous", command=self.show_previous_image)
+        self.prev_button = tk.Button(button_frame, text="Previous", command=self.show_previous_image)
         self.prev_button.pack()
 
-        self.next_button = tk.Button(root, text="Next", command=self.show_next_image)
+        self.next_button = tk.Button(button_frame, text="Next", command=self.show_next_image)
         self.next_button.pack()
 
         self.grid_size_var = tk.StringVar(root)
         self.grid_size_var.set("512x512")
-        self.grid_size_dropdown = tk.OptionMenu(root, self.grid_size_var, "512x512", "1024x1024",
+        self.grid_size_dropdown = tk.OptionMenu(button_frame, self.grid_size_var, "512x512", "1024x1024",
                                                 command=self.update_grid_size)
         self.grid_size_dropdown.pack()
 
